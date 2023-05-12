@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import feign.pojo.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * @author lijinwang
@@ -32,7 +35,10 @@ public class OrderServiceIMpl implements OrderService {
         User user = userClient.findById(order.getUserId());
         order.setUser(user);
         String queueName = "sim.queue";
-        rabbitTemplate.convertAndSend(queueName,order.getId());
+        Map<String,Object> map = new HashMap();
+        map.put("username", user.getUsername());
+        map.put("orderId", order.getId());
+        rabbitTemplate.convertAndSend(queueName,map);
         return order;
     }
 }
